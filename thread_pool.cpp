@@ -14,11 +14,8 @@ thread_pool::thread_pool(int size): m_queue(), m_threads()
 
 thread_pool::~thread_pool()
 {
-	m_queue.unlock_all();
-	for (auto& t : m_threads)
-	{
-		t.join();
-	}
+	m_queue.stop();
+	joinThreads();
 }
 
 void thread_pool::submit(std::function<void()> func)
@@ -30,6 +27,12 @@ void thread_pool::submit(std::function<void()> func)
 void thread_pool::submit(std::packaged_task<void()> task)
 {
 	m_queue.push(std::move(task));
+}
+
+void thread_pool::join()
+{
+	m_queue.stopWhenEmpty();
+	joinThreads();
 }
 
 void thread_pool::work()
@@ -44,4 +47,14 @@ void thread_pool::work()
 			task.value()();
 		}
 	} while (terminated);
+}
+
+void thread_pool::joinThreads()
+{
+	for (auto& t : m_threads)
+	{
+		t.join();
+	}
+
+	m_threads.clear();
 }
