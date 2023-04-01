@@ -24,24 +24,24 @@ int main()
 		std::cout << str << std::endl;
 	};
 
-	auto task1 = [&threadSafePrint]()
+	auto task1 = [&threadSafePrint](int iteration)
 	{
-		threadSafePrint("Стартует задача типа 1");
+		threadSafePrint("Стартует задача типа 1, итерация " + iteration);
 		std::this_thread::sleep_for(1s);
-		threadSafePrint("Завершается задача типа 1");
+		threadSafePrint("Завершается задача типа 1, итерация " + iteration);
 	};
 
-	auto task2 = [&threadSafePrint]()
+	auto task2 = [&threadSafePrint](int iteration)
 	{
-		threadSafePrint("Стартует задача типа 2");
+		threadSafePrint("Стартует задача типа 2, итерация " + iteration);
 		std::this_thread::sleep_for(2s);
-		threadSafePrint("Завершается задача типа 2");
+		threadSafePrint("Завершается задача типа 2, итерация " + iteration);
 	};
 
 	for (auto i = 0; i < 10; ++i)
 	{
-		tp.submit(task1);
-		tp.submit(task2);
+		tp.submit(task1, i);
+		tp.submit(task2, i);
 	}
 
 	tp.join();
