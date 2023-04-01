@@ -41,7 +41,7 @@ int main()
 	for (auto i = 0; i < 10; ++i)
 	{
 		tp.submit(task1);
-		tp.submit(task2);
+		tp.submit(std::packaged_task(task2));
 	}
 
 	tp.join();
