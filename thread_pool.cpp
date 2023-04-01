@@ -24,7 +24,7 @@ void thread_pool::submit(std::function<void()> func)
 	m_queue.push(std::move(task));
 }
 
-void thread_pool::submit(std::packaged_task<void()> task)
+void thread_pool::submit(std::packaged_task<void()>&& task)
 {
 	m_queue.push(std::move(task));
 }

@@ -11,13 +11,24 @@ public:
 	explicit thread_pool(int size);
 	~thread_pool();
 	void submit(std::function<void()> func);
-	void submit(std::packaged_task<void()> task);
+	void submit(std::packaged_task<void()>&& task);
 	template <typename Func, typename ...TArgs>
 	void submit(Func&& func, TArgs&&... args)
 	{
-		auto parameterless = std::bind(func, std::forward<decltype(args)>(args)...);
-		submit([moved = std::move(parameterless)]() { moved(); });
+		auto argsTuple = std::make_tuple(std::forward<TArgs>(args)...);
+		auto parameterless = [f = std::move(func), args = std::move(argsTuple)]
+		{
+			std::apply(std::move(f), std::move(args));
+		};
+
+		//std::packaged_task<void()> task(std::move(parameterless));
+		//submit(std::move(task));
 	}
+
+	/*template <typename ...TArgs>
+	void submit1(std::packaged_task<void(TArgs&&...)>&& func, TArgs&&... args)
+	{
+	}*/
 
 	void join();
 private:
