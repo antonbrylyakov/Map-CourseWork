@@ -1,0 +1,47 @@
+#include "thread_pool.h"
+
+thread_pool::thread_pool(): thread_pool(std::thread::hardware_concurrency())
+{
+}
+
+thread_pool::thread_pool(int size): m_queue(), m_threads()
+{
+	for (size_t i = 0; i < size; ++i)
+	{
+		m_threads.push_back(std::thread(&thread_pool::work, this));
+	}
+}
+
+thread_pool::~thread_pool()
+{
+	m_queue.unlock_all();
+	for (auto& t : m_threads)
+	{
+		t.join();
+	}
+}
+
+void thread_pool::submit(std::function<void()> func)
+{
+	std::packaged_task<void()> task([func] { func(); });
+	m_queue.push(std::move(task));
+}
+
+void thread_pool::submit(std::packaged_task<void()> task)
+{
+	m_queue.push(std::move(task));
+}
+
+void thread_pool::work()
+{
+	bool terminated;
+	do
+	{
+		auto task = m_queue.pop();
+		terminated = task.has_value();
+		if (terminated)
+		{
+			task.value()();
+		}
+	} while (terminated);
+}
