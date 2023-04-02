@@ -65,6 +65,7 @@ public:
 	{
 		std::lock_guard<std::mutex> lock(m_lock);
 		m_waitingEmpty = true;
+		m_event.notify_all();
 	}
 
 private:

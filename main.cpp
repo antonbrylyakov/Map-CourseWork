@@ -38,7 +38,10 @@ int main()
 	for (auto i = 0; i < 100; ++i)
 	{
 		std::this_thread::sleep_for(1s);
+		// Пример передачи функции
 		tp.submit(task1, i);
+
+		// Пример передачи packaged_task
 		std::packaged_task<void(int)> pTask2(task2);
 		tp.submit(std::move(pTask2), i);
 	}
