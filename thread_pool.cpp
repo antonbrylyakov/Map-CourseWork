@@ -1,11 +1,17 @@
 #include "thread_pool.h"
+#include <stdexcept>
 
-thread_pool::thread_pool(): thread_pool(std::thread::hardware_concurrency() - 1)
+thread_pool::thread_pool(): thread_pool(std::thread::hardware_concurrency() > 1 ? std::thread::hardware_concurrency() : 1)
 {
 }
 
 thread_pool::thread_pool(int size): m_queue(), m_threads()
 {
+	if (size < 1)
+	{
+		throw std::invalid_argument("Количество потоков в пуле не может быть менее одного");
+	}
+
 	for (size_t i = 0; i < size; ++i)
 	{
 		m_threads.push_back(std::thread(&thread_pool::work, this));

@@ -10,12 +10,6 @@ public:
 	// Конструктор по умолчанию создает пул потоков с количеством hardware_concurrency() - 1
 	thread_pool();
 
-	// Потоки и задачи не копируются, поэтому конструктор копирования и оператор копирующего присваивания удален
-	//thread_pool(const thread_pool&) = delete;
-	//thread_pool& operator=(const thread_pool&) = delete;
-	//thread_pool(thread_pool&& src) = default;
-	//thread_pool& operator=(thread_pool&& src) = default;
-
 	// Конструктор с указанием количества потоков в пуле
 	explicit thread_pool(int size);
 
