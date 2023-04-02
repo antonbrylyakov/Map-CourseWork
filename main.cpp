@@ -46,6 +46,8 @@ int main()
 		tp.submit(std::move(pTask2), i);
 	}
 
+	thread_pool tp2(std::move(tp));
+
 	tp.join();
 
 	return 0;

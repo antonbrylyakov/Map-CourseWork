@@ -1,6 +1,6 @@
 #include "thread_pool.h"
 
-thread_pool::thread_pool(): thread_pool(std::thread::hardware_concurrency())
+thread_pool::thread_pool(): thread_pool(std::thread::hardware_concurrency() - 1)
 {
 }
 
