@@ -12,23 +12,18 @@ public:
 	~thread_pool();
 	void submit(std::function<void()> func);
 	void submit(std::packaged_task<void()>&& task);
-	template <typename Func, typename ...TArgs>
-	void submit(Func&& func, TArgs&&... args)
+	template <typename F, typename ...Args>
+	void submit(F f, Args... a)
 	{
-		auto argsTuple = std::make_tuple(std::forward<TArgs>(args)...);
-		auto parameterless = [f = std::move(func), args = std::move(argsTuple)]
+		std::function<void(void)> capturePt = [pf = std::make_shared<F>(std::move(f)), tuple = std::make_tuple(std::forward<Args>(a)...)]()
 		{
-			std::apply(std::move(f), std::move(args));
+			std::apply((*pf), tuple);
 		};
 
-		//std::packaged_task<void()> task(std::move(parameterless));
-		//submit(std::move(task));
-	}
+		std::packaged_task<void(void)> parameterless(std::move(capturePt));
 
-	/*template <typename ...TArgs>
-	void submit1(std::packaged_task<void(TArgs&&...)>&& func, TArgs&&... args)
-	{
-	}*/
+		submit(std::move(parameterless));
+	}
 
 	void join();
 private:

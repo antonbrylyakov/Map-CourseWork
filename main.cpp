@@ -27,24 +27,20 @@ int main()
 
 	auto task1 = [&threadSafePrint](int iteration)
 	{
-		threadSafePrint("Стартует задача типа 1, итерация " + std::to_string(iteration));
-		std::this_thread::sleep_for(1s);
-		threadSafePrint("Завершается задача типа 1, итерация " + std::to_string(iteration));
+		threadSafePrint("Задача типа 1, итерация " + std::to_string(iteration));
 	};
 
 	auto task2 = [&threadSafePrint](int iteration)
 	{
-		threadSafePrint("Стартует задача типа 2, итерация " + std::to_string(iteration));
-		std::this_thread::sleep_for(2s);
-		threadSafePrint("Завершается задача типа 2, итерация " + std::to_string(iteration));
+		threadSafePrint("Задача типа 2, итерация " + std::to_string(iteration));
 	};
 
-	for (auto i = 0; i < 10; ++i)
+	for (auto i = 0; i < 100; ++i)
 	{
+		std::this_thread::sleep_for(1s);
 		tp.submit(task1, i);
 		std::packaged_task<void(int)> pTask2(task2);
 		tp.submit(std::move(pTask2), i);
-		//tp.submit(task2, i);
 	}
 
 	tp.join();
