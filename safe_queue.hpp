@@ -19,7 +19,7 @@ public:
 	{
 		while (true)
 		{
-			std::unique_lock<std::mutex> lock;
+			std::unique_lock<std::mutex> lock(m_lock);
 			if (m_stopped)
 			{
 				return std::optional<T>();
