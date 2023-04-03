@@ -6,7 +6,6 @@
 #include <chrono>
 #include <string>
 #include "thread_pool.h"
-#include "selectionSort.hpp"
 
 using namespace std::chrono;
 
@@ -17,7 +16,7 @@ int main()
 	SetConsoleCP(1251);
 #endif
 // Задача одновременного вывода на экран
-/*
+
 	thread_pool tp;
 	std::mutex lk;
 
@@ -49,14 +48,7 @@ int main()
 	}
 
 	tp.join();
-	*/
-
-	// Задача сортировки выбором
-
-	auto vectorSize = 200'000;
-
-	testSelectionSort(vectorSize, 2);
-	testSelectionSort(vectorSize, 1);
+	
 
 	return 0;
 }
