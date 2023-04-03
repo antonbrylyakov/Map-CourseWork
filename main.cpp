@@ -6,6 +6,7 @@
 #include <chrono>
 #include <string>
 #include "thread_pool.h"
+#include "selectionSort.hpp"
 
 using namespace std::chrono;
 
@@ -15,7 +16,8 @@ int main()
 #ifdef _WIN32
 	SetConsoleCP(1251);
 #endif
-
+// Задача одновременного вывода на экран
+/*
 	thread_pool tp;
 	std::mutex lk;
 
@@ -35,7 +37,7 @@ int main()
 		threadSafePrint("Задача типа 2, итерация " + std::to_string(iteration));
 	};
 
-	for (auto i = 0; i < 100; ++i)
+	for (auto i = 0; i < 20; ++i)
 	{
 		std::this_thread::sleep_for(1s);
 		// Пример передачи функции
@@ -46,9 +48,15 @@ int main()
 		tp.submit(std::move(pTask2), i);
 	}
 
-	thread_pool tp2(std::move(tp));
-
 	tp.join();
+	*/
+
+	// Задача сортировки выбором
+
+	auto vectorSize = 200'000;
+
+	testSelectionSort(vectorSize, 2);
+	testSelectionSort(vectorSize, 1);
 
 	return 0;
 }

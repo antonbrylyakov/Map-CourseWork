@@ -47,12 +47,12 @@ void thread_pool::work()
 	do
 	{
 		auto task = m_queue.pop();
-		terminated = task.has_value();
-		if (terminated)
+		terminated = !task.has_value();
+		if (!terminated)
 		{
 			task.value()();
 		}
-	} while (terminated);
+	} while (!terminated);
 }
 
 void thread_pool::joinThreads()
