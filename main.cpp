@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <string>
 #include "thread_pool.h"
 
 using namespace std::chrono;
@@ -14,6 +15,7 @@ int main()
 #ifdef _WIN32
 	SetConsoleCP(1251);
 #endif
+// Задача одновременного вывода на экран
 
 	thread_pool tp;
 	std::mutex lk;
@@ -24,27 +26,29 @@ int main()
 		std::cout << str << std::endl;
 	};
 
-	auto task1 = [&threadSafePrint]()
+	auto task1 = [&threadSafePrint](int iteration)
 	{
-		threadSafePrint("Стартует задача типа 1");
+		threadSafePrint("Задача типа 1, итерация " + std::to_string(iteration));
+	};
+
+	auto task2 = [&threadSafePrint](int iteration)
+	{
+		threadSafePrint("Задача типа 2, итерация " + std::to_string(iteration));
+	};
+
+	for (auto i = 0; i < 20; ++i)
+	{
 		std::this_thread::sleep_for(1s);
-		threadSafePrint("Завершается задача типа 1");
-	};
+		// Пример передачи функции
+		tp.submit(task1, i);
 
-	auto task2 = [&threadSafePrint]()
-	{
-		threadSafePrint("Стартует задача типа 2");
-		std::this_thread::sleep_for(2s);
-		threadSafePrint("Завершается задача типа 2");
-	};
-
-	for (auto i = 0; i < 10; ++i)
-	{
-		tp.submit(task1);
-		tp.submit(std::packaged_task(task2));
+		// Пример передачи packaged_task
+		std::packaged_task<void(int)> pTask2(task2);
+		tp.submit(std::move(pTask2), i);
 	}
 
 	tp.join();
+	
 
 	return 0;
 }
