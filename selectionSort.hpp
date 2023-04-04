@@ -9,9 +9,9 @@ using namespace std::chrono;
 template <typename TIt>
 void selectionSort(TIt begin, TIt end, int maxParallelism = 1)
 {
-	auto minFunc = [end](TIt localBegin, TIt localEnd)
+	auto minFunc = [](TIt localBegin, TIt localEnd)
 	{
-		return std::min_element(localBegin, end);
+		return std::min_element(localBegin, localEnd);
 	};
 
 	std::unique_ptr<thread_pool> tp;
@@ -77,7 +77,7 @@ void selectionSort(TIt begin, TIt end, int maxParallelism = 1)
 }
 
 
-void testSelectionSort(size_t vectorSize, size_t maxParallelism)
+void testSelectionSort(size_t vectorSize, bool print, size_t maxParallelism)
 {
 
 		std::mt19937 gen(steady_clock::now().time_since_epoch().count());
@@ -91,8 +91,12 @@ void testSelectionSort(size_t vectorSize, size_t maxParallelism)
 		auto end = steady_clock::now();
 		std::chrono::duration<double> duration = end - start;
 
-		/*std::cout << "Отсортированный вектор" << std::endl;
-		std::for_each(vec.cbegin(), vec.cend(), [](int v) { std::cout << v << " ";  });
-		std::cout << std::endl;*/
+		if (print)
+		{
+			std::cout << "Отсортированный вектор" << std::endl;
+			std::for_each(vec.cbegin(), vec.cend(), [](int v) { std::cout << v << " ";  });
+			std::cout << std::endl;
+		}
+
 		std::cout << "Время выполнения в " << maxParallelism << " потоках: " << duration.count() << "s" << std::endl;
 }
