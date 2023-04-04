@@ -53,9 +53,9 @@ int main()
 
 	// Задача сортировки выбором
 
-	auto vectorSize = 200'000;
+	auto vectorSize = 500'000;
 
-	testSelectionSort(vectorSize, 2);
+	testSelectionSort(vectorSize, 6);
 	testSelectionSort(vectorSize, 1);
 
 	return 0;

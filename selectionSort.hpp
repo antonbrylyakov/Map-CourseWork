@@ -9,7 +9,6 @@ using namespace std::chrono;
 template <typename TIt>
 void selectionSort(TIt begin, TIt end, int maxParallelism = 1)
 {
-	// с учебной целью возвращать результат будем через future, получаемый из promise
 	auto minFunc = [end](TIt localBegin, TIt localEnd)
 	{
 		return std::min_element(localBegin, end);
@@ -21,18 +20,19 @@ void selectionSort(TIt begin, TIt end, int maxParallelism = 1)
 		tp = std::make_unique<thread_pool>(maxParallelism);
 	}
 
+	std::vector<std::future<TIt>> futures(maxParallelism);
+
 	while (begin != end)
 	{
 		// Делим массив на части, в каждой части ищем минимум параллельно
 		// потом ищем минимум из найденных минимумов.
 		auto size = std::distance(begin, end);
-		auto batchCount = size < 100 ? 1 : maxParallelism;
+		auto batchCount = size < 10000 ? 1 : maxParallelism;
 		auto wholeBatchSize = size / batchCount;
 		auto additionalItems = size % batchCount;
 		auto iterationBegin = begin;
 		auto localBegin = begin;
-		std::vector<std::future<TIt>> futures;
-
+		
 		for (size_t i = 0; i < batchCount; ++i)
 		{
 			auto currentBatchSize = wholeBatchSize;
@@ -46,7 +46,7 @@ void selectionSort(TIt begin, TIt end, int maxParallelism = 1)
 			std::advance(localEnd, currentBatchSize);
 
 			std::packaged_task<TIt(TIt, TIt)> minPt(minFunc);
-			futures.push_back(minPt.get_future());
+			futures[i] = minPt.get_future();
 
 			if (i == batchCount - 1)
 			{
@@ -62,9 +62,9 @@ void selectionSort(TIt begin, TIt end, int maxParallelism = 1)
 
 		std::optional<TIt> min;
 
-		for (auto& f : futures)
+		for (int i = 0; i < batchCount; ++i)
 		{
-			auto currIt = f.get();
+			auto currIt = futures[i].get();
 			if (!min.has_value() || *min.value() > *currIt)
 			{
 				min = currIt;
