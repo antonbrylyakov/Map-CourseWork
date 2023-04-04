@@ -1,18 +1,25 @@
 #include "thread_pool.h"
 #include <stdexcept>
 
-thread_pool::thread_pool(): thread_pool(std::thread::hardware_concurrency() > 1 ? std::thread::hardware_concurrency() : 1)
+thread_pool::thread_pool(): thread_pool(0)
 {
 }
 
 thread_pool::thread_pool(int size): m_queue(), m_threads()
 {
-	if (size < 1)
+	if (size < 0)
 	{
-		throw std::invalid_argument("Количество потоков в пуле не может быть менее одного");
+		throw std::invalid_argument("Количество потоков в пуле должно быть неотрицательным. 0 - автовыбор");
 	}
 
-	for (size_t i = 0; i < size; ++i)
+	auto threadCount =
+		size > 0 
+		? size 
+		:(std::thread::hardware_concurrency() > 1 
+			? std::thread::hardware_concurrency()
+			: 1);
+
+	for (size_t i = 0; i < threadCount; ++i)
 	{
 		m_threads.push_back(std::thread(&thread_pool::work, this));
 	}
@@ -41,6 +48,11 @@ void thread_pool::join()
 	joinThreads();
 }
 
+size_t thread_pool::getThreadCount()
+{
+	return m_threads.size();
+}
+
 void thread_pool::work()
 {
 	bool terminated;
@@ -59,8 +71,9 @@ void thread_pool::joinThreads()
 {
 	for (auto& t : m_threads)
 	{
-		t.join();
+		if (t.joinable())
+		{
+			t.join();
+		}
 	}
-
-	m_threads.clear();
 }
