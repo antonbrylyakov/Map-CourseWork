@@ -18,11 +18,11 @@ int main()
 #endif
 	// Задача сортировки выбором
 
-	auto vectorSize = 100'000;
+	auto vectorSize = 200'000;
 
 	std::cout << "Сортировка выбором вектора из " << vectorSize << " элементов" << std::endl;
 
-	testSelectionSort(vectorSize, false, 6);
+	testSelectionSort(vectorSize, false, std::thread::hardware_concurrency());
 	testSelectionSort(vectorSize, false, 1);
 
 	return 0;
