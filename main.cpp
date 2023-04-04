@@ -29,11 +29,13 @@ int main()
 	auto task1 = [&threadSafePrint](int iteration)
 	{
 		threadSafePrint("Задача типа 1, итерация " + std::to_string(iteration));
+		return iteration;
 	};
 
 	auto task2 = [&threadSafePrint](int iteration)
 	{
 		threadSafePrint("Задача типа 2, итерация " + std::to_string(iteration));
+		return iteration;
 	};
 
 	for (auto i = 0; i < 20; ++i)
@@ -43,8 +45,14 @@ int main()
 		tp.submit(task1, i);
 
 		// Пример передачи packaged_task
-		std::packaged_task<void(int)> pTask2(task2);
+		std::packaged_task<int(int)> pTask2(task2);
+		auto future = pTask2.get_future();
 		tp.submit(std::move(pTask2), i);
+		// Из packaged_task мы можем получить результат
+		auto ptResult = future.get();
+
+		std::lock_guard<std::mutex> lg(lk);
+		std::cout << "Результат packaged_task = " << ptResult << std::endl;
 	}
 
 	tp.join();
