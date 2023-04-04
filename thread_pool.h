@@ -41,6 +41,7 @@ public:
 
 	// Метод ожидания потоков пула. Используется перед завершением работы, если нужно дождаться освобождения потоков.
 	void join();
+	size_t getThreadCount();
 private:
 	safe_queue<std::packaged_task<void()>> m_queue;
 	std::vector<std::thread> m_threads;
